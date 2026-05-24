@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRP Publications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink:#1a1714;--paper:#f5f0e8;--cream:#ede8dc;
+    --gold:#b8860b;--gold-light:#d4a017;--rule:#2c2420;
+    --text:#2c2420;--muted:#6b5f54;--border:#c4b89a;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Crimson Pro',Georgia,serif;background:var(--paper);color:var(--text);min-height:100vh}
+
+  /* PAGE TRANSITIONS */
+  .page{display:none;animation:fadeIn 0.35s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* NAV */
+  nav{background:var(--rule);padding:0 2rem;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+  .nav-brand{display:flex;align-items:center;gap:10px;padding:14px 0;cursor:pointer;text-decoration:none}
+  .nav-logo{width:34px;height:34px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:15px;color:#1a1714;border-radius:2px;flex-shrink:0}
+  .nav-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#f5f0e8;letter-spacing:1px;text-transform:uppercase}
+  .nav-links{display:flex;align-items:stretch}
+  .nav-link{padding:0 16px;display:flex;align-items:center;font-size:13px;letter-spacing:0.8px;text-transform:uppercase;color:#c4b89a;cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;font-family:'Crimson Pro',serif;font-weight:400}
+  .nav-link:hover,.nav-link.active{color:#f5f0e8;border-bottom-color:var(--gold)}
+
+  /* HERO */
+  .hero{background:var(--rule);padding:80px 2rem 72px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(196,184,154,0.05) 39px,rgba(196,184,154,0.05) 40px);pointer-events:none}
+  .hero-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;font-family:'Crimson Pro',serif}
+  .hero-title{font-family:'Playfair Display',serif;font-size:50px;font-weight:700;color:#f5f0e8;line-height:1.15;margin-bottom:16px;max-width:700px;margin-left:auto;margin-right:auto}
+  .hero-title em{font-style:italic;color:var(--gold-light)}
+  .hero-sub{font-size:18px;color:#c4b89a;max-width:500px;margin:0 auto 34px;line-height:1.65;font-weight:300}
+  .hero-rule{width:52px;height:2px;background:var(--gold);margin:0 auto 34px}
+  .btn-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:11px 28px;font-family:'Crimson Pro',serif;font-size:15px;letter-spacing:0.4px;cursor:pointer;border-radius:2px;transition:all 0.2s;font-weight:600;text-decoration:none;display:inline-block}
+  .btn-gold{background:var(--gold);color:#1a1714;border:2px solid var(--gold)}
+  .btn-gold:hover{background:var(--gold-light);border-color:var(--gold-light)}
+  .btn-outline{background:transparent;color:#f5f0e8;border:2px solid #c4b89a}
+  .btn-outline:hover{border-color:#f5f0e8;color:#f5f0e8}
+  .btn-dark{background:transparent;color:var(--text);border:2px solid var(--rule);font-size:14px}
+  .btn-dark:hover{background:var(--rule);color:#f5f0e8}
+
+  /* LAYOUT */
+  section{padding:60px 2rem}
+  .container{max-width:960px;margin:0 auto}
+  .section-header{text-align:center;margin-bottom:48px}
+  .section-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+  .section-title{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--text);margin-bottom:12px}
+  .section-rule{width:40px;height:2px;background:var(--gold);margin:0 auto}
+
+  /* STATS STRIP */
+  .stats-strip{background:var(--cream);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  .stat-item{padding:30px 20px;border-right:1px solid var(--border);text-align:center}
+  .stat-item:last-child{border-right:none}
+  .stat-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--gold);line-height:1}
+  .stat-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+  /* BOOKS GRID */
+  .books-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:28px}
+  .book-card{cursor:pointer;transition:transform 0.2s}
+  .book-card:hover{transform:translateY(-5px)}
+  .book-cover{width:100%;aspect-ratio:2/3;position:relative;overflow:hidden;border:1px solid var(--border);display:flex;flex-direction:column}
+  .book-spine{position:absolute;left:0;top:0;width:10px;height:100%;background:rgba(0,0,0,0.22)}
+  .cover-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px 16px 16px}
+  .cover-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:0.7;align-self:flex-start}
+  .cover-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
+  .cover-icon{font-size:28px;opacity:0.9}
+  .cover-title{font-family:'Playfair Display',serif;font-weight:700;font-size:13px;line-height:1.35;text-align:center}
+  .cover-line{width:24px;height:1px;opacity:0.5}
+  .cover-author{font-size:10px;letter-spacing:0.5px;text-align:center;opacity:0.8}
+  .book-info{padding:12px 0}
+  .book-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--text);line-height:1.35}
+  .book-auth{font-size:12px;color:var(--muted);margin-top:3px}
+  .book-tag{display:inline-block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-top:6px;background:rgba(184,134,11,0.1);padding:3px 8px;border-radius:1px}
+  .book-amazon{display:inline-block;margin-top:8px;font-size:11px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px;cursor:pointer}
+  .book-amazon:hover{color:var(--gold);border-color:var(--gold)}
+
+  /* FILTER BAR */
+  .filter-bar{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;justify-content:center}
+  .filter-btn{padding:7px 18px;font-family:'Crimson Pro',serif;font-size:12px;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:1px;transition:all 0.2s}
+  .filter-btn.active,.filter-btn:hover{background:var(--rule);color:#f5f0e8;border-color:var(--rule)}
+
+  /* COVER COLORS */
+  .bg-java{background:#1e2d1a;color:#d4e8d0}
+  .bg-hypy{background:#1a1f38;color:#d0d4f0}
+  .bg-hypl{background:#1f1a38;color:#d8d0f0}
+  .bg-mlt{background:#2a1a2a;color:#ecd0ec}
+  .bg-bigdata{background:#1a2828;color:#d0e8e8}
+  .bg-dw{background:#281a10;color:#f0e0d0}
+
+  /* ABOUT */
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+  .about-text{font-size:17px;line-height:1.8}
+  .about-text p{margin-bottom:16px}
+  .pull-quote{font-family:'Playfair Display',serif;font-size:21px;font-style:italic;border-left:3px solid var(--gold);padding-left:20px;margin:22px 0;line-height:1.55;color:var(--text)}
+  .team-list{display:flex;flex-direction:column;gap:14px}
+  .team-card{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--border);padding:14px;border-radius:2px}
+  .avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:16px;flex-shrink:0}
+  .t-name{font-family:'Playfair Display',serif;font-weight:600;font-size:15px;color:var(--text)}
+  .t-role{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:0.3px}
+
+  /* SUBMISSIONS */
+  .sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px}
+  .sub-info h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:14px;color:var(--text)}
+  .sub-info ul{list-style:none;padding:0;margin:16px 0}
+  .sub-info li{padding:9px 0;border-bottom:1px solid var(--border);font-size:15px;display:flex;align-items:center;gap:10px;color:var(--text)}
+  .sub-info li::before{content:'—';color:var(--gold);font-weight:700}
+  .info-box{margin-top:24px;padding:20px;background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--gold)}
+  .info-box-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .form-group{margin-bottom:18px}
+  .form-label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .form-input,.form-select,.form-textarea{width:100%;background:var(--cream);border:1px solid var(--border);padding:10px 14px;font-family:'Crimson Pro',serif;font-size:15px;color:var(--text);border-radius:1px;outline:none;transition:border-color 0.2s}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold)}
+  .form-textarea{height:110px;resize:vertical}
+  .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23b8860b' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  .sub-thanks{display:none;text-align:center;padding:40px 20px;background:var(--cream);border:1px solid var(--border);border-radius:2px}
+  .sub-thanks.show{display:block}
+  .sub-form.hide{display:none}
+
+  /* MODAL */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(28,20,16,0.78);z-index:200;align-items:center;justify-content:center}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--paper);max-width:560px;width:92%;border:1px solid var(--border);padding:32px;position:relative;border-radius:2px;max-height:88vh;overflow-y:auto}
+  .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;transition:color 0.2s}
+  .modal-close:hover{color:var(--text)}
+  .modal-cover{width:100%;height:170px;border-radius:2px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:40px}
+  .modal-tag{display:inline-block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);background:rgba(184,134,11,0.1);padding:3px 8px;border-radius:1px;margin-bottom:14px}
+  .modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+  .modal-author{font-size:14px;color:var(--muted);margin-bottom:16px}
+  .modal-desc{font-size:15px;line-height:1.8;color:var(--text);margin-bottom:22px}
+  .modal-btns{display:flex;gap:10px;flex-wrap:wrap}
+
+  /* PAGE HEADERS */
+  .page-header{background:var(--rule);padding:52px 2rem 44px;text-align:center}
+  .page-header h1{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:#f5f0e8;margin-top:6px}
+  .page-header p{font-size:15px;color:#c4b89a;margin-top:10px;font-family:'Crimson Pro',serif}
+
+  /* FOOTER */
+  footer{background:var(--rule);padding:50px 2rem 28px;color:#c4b89a}
+  .footer-inner{max-width:960px;margin:0 auto}
+  .footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid rgba(196,184,154,0.18)}
+  .footer-brand{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f5f0e8;margin-bottom:10px}
+  .footer-tagline{font-size:13px;line-height:1.75;max-width:260px}
+  .footer-col h4{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#f5f0e8;margin-bottom:14px}
+  .footer-col a{display:block;font-size:13px;color:#c4b89a;margin-bottom:8px;cursor:pointer;text-decoration:none;transition:color 0.2s}
+  .footer-col a:hover{color:#f5f0e8}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b5f54}
+
+  /* RESPONSIVE */
+  @media(max-width:700px){
+    .hero-title{font-size:32px}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .stat-item:nth-child(2){border-right:none}
+    .about-grid,.sub-grid{grid-template-columns:1fr}
+    .footer-top{grid-template-columns:1fr}
+    nav{flex-wrap:wrap;padding:0 1rem}
+    .nav-links{overflow-x:auto}
+    .nav-link{padding:0 10px;font-size:11px}
+    .page-header h1{font-size:30px}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-brand" onclick="show('home')">
+    <div class="nav-logo">M</div>
+    <div class="nav-title">MRP Publications</div>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active" id="nl-home" onclick="show('home')">Home</div>
+    <div class="nav-link" id="nl-catalog" onclick="show('catalog')">Catalog</div>
+    <div class="nav-link" id="nl-about" onclick="show('about')">About</div>
+    <div class="nav-link" id="nl-submit" onclick="show('submit')">Submit</div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════ HOME PAGE -->
+<div class="page active" id="pg-home">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Dr. Puttaswamy M R · Technical Publications</div>
+    <h1 class="hero-title">Knowledge that <em>empowers</em>, books that inspire</h1>
+    <div class="hero-rule"></div>
+    <p class="hero-sub">MRP Publications brings rigorous, practical technical education to students, researchers and professionals worldwide.</p>
+    <div class="btn-group">
+      <button class="btn btn-gold" onclick="show('catalog')">Browse All Books</button>
+      <button class="btn btn-outline" onclick="show('submit')">Submit a Manuscript</button>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-num">6</div><div class="stat-label">Published Titles</div></div>
+        <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Subject Areas</div></div>
+        <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Kindle Access</div></div>
+        <div class="stat-item"><div class="stat-num">Global</div><div class="stat-label">Reach via Amazon</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section style="background:var(--paper)">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Featured Works</div>
+        <h2 class="section-title">Books by Dr. Puttaswamy M R</h2>
+        <div class="section-rule"></div>
+      </div>
+      <div class="books-grid" id="home-grid"></div>
+      <div style="text-align:center;margin-top:36px">
+        <button class="btn btn-dark" onclick="show('catalog')">View Full Catalog →</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--cream);border-top:1px solid var(--border)">
+    <div class="container" style="max-width:640px;text-align:center">
+      <div class="section-eyebrow">For Researchers &amp; Writers</div>
+      <h2 class="section-title">Publish with MRP</h2>
+      <div class="section-rule" style="margin:14px auto 24px"></div>
+      <p style="font-size:18px;line-height:1.8;color:var(--muted);margin-bottom:28px">We welcome technical manuscripts in computer science, data science, remote sensing, and related disciplines. All submissions are reviewed with care.</p>
+      <button class="btn btn-gold" onclick="show('submit')">Submit Your Work</button>
+    </div>
+  </section>
+
+</div><!-- /home -->
+
+<!-- ══════════════════════════════════════════════════ CATALOG PAGE -->
+<div class="page" id="pg-catalog">
+
+  <div class="page-header">
+    <div class="hero-eyebrow">MRP Publications</div>
+    <h1>Complete Catalog</h1>
+    <p>All titles available on Amazon Kindle &amp; Paperback</p>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="filter-bar" id="filter-bar"></div>
+      <div class="books-grid" id="catalog-grid"></div>
+    </div>
+  </section>
+
+</div><!-- /catalog -->
+
+<!-- ══════════════════════════════════════════════════ ABOUT PAGE -->
+<div class="page" id="pg-about">
+
+  <div class="page-header">
+    <div class="hero-eyebrow">Our Story</div>
+    <h1>About MRP Publications</h1>
+  </div>
+
+  <section style="background:var(--cream);border-top:1px solid var(--border)">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <div class="about-text">
+            <p>MRP Publications is a technical publishing house specialising in computer science, data science, hyperspectral imaging, and software engineering. Founded by Dr. Puttaswamy M R, we are committed to producing high-quality educational resources that bridge theory and practice.</p>
+            <p>Our books are designed for students, researchers, and professionals who require structured, hands-on learning materials. Each title is crafted with clarity, depth, and practical application in mind.</p>
+            <div class="pull-quote">"We believe that accessible, rigorous technical education has the power to transform careers and advance research."</div>
+            <p>All MRP Publications titles are available globally through Amazon in both Kindle and paperback formats, ensuring learners everywhere can access the knowledge they need.</p>
+            <p>We work closely with co-authors and subject-matter experts to ensure every book meets the highest standards of accuracy, pedagogy, and practical value.</p>
+          </div>
+        </div>
+        <div>
+          <div class="section-eyebrow" style="margin-bottom:20px">Authors &amp; Contributors</div>
+          <div class="team-list">
+            <div class="team-card">
+              <div class="avatar" style="background:#1e2d1a;color:#d4e8d0">PM</div>
+              <div><div class="t-name">Dr. Puttaswamy M R</div><div class="t-role">Founder, Author &amp; Principal Editor</div></div>
+            </div>
+            <div class="team-card">
+              <div class="avatar" style="background:#1a1f38;color:#d0d4f0">SJ</div>
+              <div><div class="t-name">Dr. Santhosh John</div><div class="t-role">Co-author, Java Series</div></div>
+            </div>
+            <div class="team-card">
+              <div class="avatar" style="background:#2a1a2a;color:#ecd0ec">RK</div>
+              <div><div class="t-name">Dr. Rashmi P. Karchi</div><div class="t-role">Co-author, Hyperspectral Series</div></div>
+            </div>
+            <div class="team-card">
+              <div class="avatar" style="background:#1f1a38;color:#d8d0f0">SM</div>
+              <div><div class="t-name">Dr. Sanjeevakumar M. Hatture</div><div class="t-role">Co-author, Deep Learning Series</div></div>
+            </div>
+            <div class="team-card">
+              <div class="avatar" style="background:#1a2828;color:#d0e8e8">PK</div>
+              <div><div class="t-name">Prakash Kumar Udupi</div><div class="t-role">Co-author, Big Data Series</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /about -->
+
+<!-- ══════════════════════════════════════════════════ SUBMIT PAGE -->
+<div class="page" id="pg-submit">
+
+  <div class="page-header">
+    <div class="hero-eyebrow">For Authors</div>
+    <h1>Submit Your Manuscript</h1>
+    <p>We read every submission with care and respond within 60 days</p>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="sub-grid">
+        <div class="sub-info">
+          <h3>What We Publish</h3>
+          <p style="font-size:15px;line-height:1.8;color:var(--muted)">MRP Publications welcomes technical manuscripts across the following areas:</p>
+          <ul>
+            <li>Computer Science &amp; Programming</li>
+            <li>Data Science &amp; Big Data</li>
+            <li>Remote Sensing &amp; Image Analysis</li>
+            <li>Machine Learning &amp; AI</li>
+            <li>Software Engineering</li>
+            <li>Other Technical Fields</li>
+          </ul>
+          <div class="info-box">
+            <div class="info-box-label">Response Timeline</div>
+            <p style="font-size:14px;line-height:1.7;color:var(--text)">We acknowledge receipt within 5 business days and aim to respond fully within 60 days. Manuscripts under active consideration may take longer.</p>
+          </div>
+        </div>
+        <div>
+          <!-- ✅ Formspree Form — replace YOUR_FORM_ID with your actual Formspree ID -->
+          <form id="sub-form" action="https://formspree.io/f/mojyrbjo" method="POST" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" type="text" name="name" id="fn" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input class="form-input" type="email" name="email" id="fe" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject Area</label>
+              <select class="form-select form-input" name="subject_area" id="fc" required>
+                <option value="">Select an area…</option>
+                <option>Computer Science &amp; Programming</option>
+                <option>Data Science &amp; Big Data</option>
+                <option>Remote Sensing &amp; Image Analysis</option>
+                <option>Machine Learning &amp; AI</option>
+                <option>Software Engineering</option>
+                <option>Other Technical Field</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Manuscript Title</label>
+              <input class="form-input" type="text" name="manuscript_title" id="ft" placeholder="Working title of your manuscript">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Brief Description</label>
+              <textarea class="form-textarea" name="description" id="fd" placeholder="Describe your manuscript, its target audience, and your background as an author…"></textarea>
+            </div>
+            <!-- Hidden spam protection -->
+            <input type="text" name="_gotcha" style="display:none">
+            <button type="submit" class="btn btn-gold" style="width:100%;text-align:center;display:block">Send Submission Query</button>
+          </form>
+          <div class="sub-thanks" id="sub-thanks">
+            <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--text);margin-bottom:10px">Thank you for reaching out</div>
+            <div style="width:36px;height:2px;background:var(--gold);margin:0 auto 16px"></div>
+            <p style="font-size:15px;line-height:1.8;color:var(--muted)">Your submission query has been received. Our editorial team will review it carefully and be in touch within 60 days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /submit -->
+
+<!-- ══════════════════════════════════════════════════ BOOK MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="handleModalBgClick(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-cover" id="m-cover"></div>
+    <span class="modal-tag" id="m-tag"></span>
+    <div class="modal-title" id="m-title"></div>
+    <div class="modal-author" id="m-author"></div>
+    <div class="modal-desc" id="m-desc"></div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" id="m-amazon-btn" onclick="openAmazon()">View on Amazon →</button>
+      <button class="btn btn-dark" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">MRP Publications</div>
+        <p class="footer-tagline">Technical books for students, researchers and professionals. Published by Dr. Puttaswamy M R. Available globally on Amazon.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <a onclick="show('home')">Home</a>
+        <a onclick="show('catalog')">Catalog</a>
+        <a onclick="show('about')">About Us</a>
+        <a onclick="show('submit')">Submit Work</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="mailto:editorial@mrppublications.com">editorial@mrppublications.com</a>
+        <a href="https://www.amazon.in/s?k=Dr.+Puttaswamy+M+R" target="_blank">Amazon India Store</a>
+        <a>Kindle &amp; Paperback</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MRP Publications. All rights reserved.</span>
+      <span>Dr. Puttaswamy M R</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════ JAVASCRIPT -->
+<script>
+const BOOKS = [
+  {
+    id:1,
+    title:"Mastering Java: From Fundamentals to Enterprise Applications",
+    shortTitle:"Mastering Java",
+    author:"Dr. Puttaswamy M R, Dr. Santhosh John, Robin Zarine & Dhivya Bino",
+    genre:"Java / Programming",
+    bg:"bg-java",
+    icon:"☕",
+    new:true,
+    desc:"A structured, practice-oriented introduction to Java programming. Covers OOP, exception handling, collections, multithreading, file handling, and JDBC. Designed to take learners from core Java fundamentals all the way to enterprise-level application development with clean coding practices and real-world design.",
+    url:"https://www.amazon.in/Mastering-Java-Fundamentals-Enterprise-Applications-ebook/dp/B0GKTFHMM5/"
+  },
+  {
+    id:2,
+    title:"Hyperspectral Image Analysis with Python: Fundamentals, Processing, and Applications",
+    shortTitle:"Hyperspectral Image Analysis with Python",
+    author:"Dr. Puttaswamy M R",
+    genre:"Hyperspectral / Python",
+    bg:"bg-hypy",
+    icon:"🔬",
+    new:true,
+    desc:"A structured introduction to hyperspectral image analysis using Python. Covers fundamental concepts, processing pipelines, and real-world applications in agriculture, environmental monitoring, mineral exploration, urban studies, and defence. Emphasises practical implementation with real hyperspectral datasets.",
+    url:"https://www.amazon.in/Hyperspectral-Image-Analysis-Python-Fundamentals-ebook/dp/B0GHZDCRP9/"
+  },
+  {
+    id:3,
+    title:"Deep Learning for Hyperspectral Image Analysis: From Fundamentals to Real World AI Applications",
+    shortTitle:"Deep Learning for Hyperspectral Analysis",
+    author:"Dr. Puttaswamy M R, Dr. Rashmi P. Karchi, Dr. Sanjeevakumar M. Hatture & Satish M N",
+    genre:"Deep Learning / AI",
+    bg:"bg-hypl",
+    icon:"🧠",
+    new:true,
+    desc:"A comprehensive guide bridging theory and practice in AI-driven hyperspectral imaging. Covers CNNs, advanced architectures, sequence models, unsupervised learning, generative models, attention mechanisms, segmentation, and real-world deployment strategies. Aimed at researchers, postgraduate students, and professionals.",
+    url:"https://www.amazon.in/Learning-Hyperspectral-Analysis-Fundamentals-Applications-ebook/dp/B0GPDN8QZW/"
+  },
+  {
+    id:4,
+    title:"Machine Learning Techniques for Hyperspectral Image Analysis: Algorithms, Feature Engineering, and Practical Implementations",
+    shortTitle:"ML Techniques for Hyperspectral Analysis",
+    author:"Dr. Puttaswamy M R & Dr. Rashmi P. Karchi",
+    genre:"Machine Learning",
+    bg:"bg-mlt",
+    icon:"📊",
+    new:false,
+    desc:"A structured introduction to classical machine learning for hyperspectral data. Covers PCA, ICA, MNF, Support Vector Machines, Random Forests, and ensemble methods. Includes benchmark datasets and case studies demonstrating the full workflow from data representation to performance evaluation.",
+    url:"https://www.amazon.in/Techniques-Hyperspectral-Algorithms-Engineering-Implementations-ebook/dp/B0GMD2QMC3/"
+  },
+  {
+    id:5,
+    title:"Practical Introduction to Big Data for Beginners: A Hands-on Approach Using Hadoop",
+    shortTitle:"Big Data for Beginners",
+    author:"Dr. Puttaswamy M R, Prakash Kumar & Jitendra P",
+    genre:"Big Data / Hadoop",
+    bg:"bg-bigdata",
+    icon:"🗄️",
+    new:false,
+    desc:"A solid foundation in big data concepts through practical, real-world applications. Covers the Hadoop ecosystem — HDFS, MapReduce, Hive, and more — with guided examples, hands-on exercises, and step-by-step instructions. Designed for beginners with no prior big data experience.",
+    url:"https://www.amazon.in/Practical-Introduction-Data-Beginners-hands-ebook/dp/B0FN9357YR/"
+  },
+  {
+    id:6,
+    title:"Practical Introduction to Data Warehousing and Big Data with Hive for Beginners",
+    shortTitle:"Data Warehousing with Hive",
+    author:"Dr. Puttaswamy M R & Prakash Kumar Udupi",
+    genre:"Data Warehousing",
+    bg:"bg-dw",
+    icon:"🏛️",
+    new:false,
+    desc:"A comprehensive guide to data warehousing principles and Apache Hive. Covers warehouse schema design, querying large datasets, and bridging traditional data processing with big data analytics. Combines theory with hands-on exercises and guided projects for a structured, accessible learning path.",
+    url:"https://www.amazon.in/Practical-Introduction-Data-Warehousing-Beginners-ebook/dp/B0FYZ7NCBY/"
+  }
+];
+
+const GENRES = ["All", ...new Set(BOOKS.map(b => b.genre))];
+let activeFilter = "All";
+let activeUrl = "";
+
+function bookCard(b) {
+  return `<div class="book-card" onclick="openModal(${b.id})">
+    <div class="book-cover ${b.bg}">
+      <div class="book-spine"></div>
+      <div class="cover-body">
+        <div class="cover-tag">${b.genre}</div>
+        <div class="cover-center">
+          <div class="cover-icon">${b.icon}</div>
+          <div class="cover-title">${b.shortTitle}</div>
+          <div class="cover-line" style="background:currentColor"></div>
+          <div class="cover-author">Dr. Puttaswamy M R</div>
+        </div>
+      </div>
+    </div>
+    <div class="book-info">
+      <div class="book-name">${b.shortTitle}</div>
+      <div class="book-auth">${b.author.split(',')[0]}</div>
+      <span class="book-tag">${b.genre}</span><br>
+      <a class="book-amazon" href="${b.url}" target="_blank" onclick="event.stopPropagation()">View on Amazon →</a>
+    </div>
+  </div>`;
+}
+
+function renderHomeGrid() {
+  document.getElementById('home-grid').innerHTML = BOOKS.slice(0, 3).map(bookCard).join('');
+}
+
+function renderCatalog() {
+  const list = activeFilter === 'All' ? BOOKS : BOOKS.filter(b => b.genre === activeFilter);
+  document.getElementById('catalog-grid').innerHTML = list.map(bookCard).join('');
+}
+
+function renderFilters() {
+  document.getElementById('filter-bar').innerHTML = GENRES.map(g =>
+    `<button class="filter-btn${g === activeFilter ? ' active' : ''}" onclick="setFilter('${g}')">${g}</button>`
+  ).join('');
+}
+
+function setFilter(g) { activeFilter = g; renderFilters(); renderCatalog(); }
+
+function openModal(id) {
+  const b = BOOKS.find(x => x.id === id);
+  const cover = document.getElementById('m-cover');
+  cover.className = 'modal-cover ' + b.bg;
+  cover.innerHTML = b.icon;
+  document.getElementById('m-tag').textContent = b.genre;
+  document.getElementById('m-title').textContent = b.title;
+  document.getElementById('m-author').textContent = b.author;
+  document.getElementById('m-desc').textContent = b.desc;
+  activeUrl = b.url;
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleModalBgClick(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
+}
+
+function openAmazon() {
+  window.open(activeUrl, '_blank');
+}
+
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('pg-' + id).classList.add('active');
+  document.getElementById('nl-' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function handleSubmit(event) {
+  event.preventDefault();
+  const form = document.getElementById('sub-form');
+  const data = new FormData(form);
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (response.ok) {
+      form.style.display = 'none';
+      document.getElementById('sub-thanks').classList.add('show');
+    } else {
+      alert('There was a problem sending your enquiry. Please try again.');
+    }
+  } catch (err) {
+    alert('Network error. Please check your connection and try again.');
+  }
+}
+
+// Keyboard close modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Init
+renderHomeGrid();
+renderFilters();
+renderCatalog();
+</script>
+</body>
+</html>
